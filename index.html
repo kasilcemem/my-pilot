@@ -5,100 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palemos Arşivi | 1600</title>
     <style>
-        :root { 
-            --bg: #1a1a1a; 
-            --paper: #fcf5e5; 
-            --ink: #2c1e14; 
-            --accent: #8e735b; 
-        }
-
-        /* Gece Modu Renkleri */
-        body.dark-mode {
-            --paper: #2c2c2c;
-            --ink: #e0d6c5;
-            --bg: #121212;
-        }
+        :root { --bg: #1a1a1a; --paper: #fcf5e5; --ink: #2c1e14; --accent: #8e735b; }
+        body.dark-mode { --paper: #2c2c2c; --ink: #e0d6c5; --bg: #121212; }
         
-        body { 
-            font-family: 'Georgia', serif; 
-            background: var(--bg); 
-            color: var(--paper); 
-            margin: 0; 
-            transition: background 0.5s, color 0.5s;
-        }
+        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--paper); margin: 0; transition: 0.5s; }
 
-        /* Giriş Kapağı */
-        #kapak { 
-            text-align: center; 
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-                        url('https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&q=80&w=1600'); 
-            background-size: cover; 
-            background-position: center;
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            border-bottom: 5px solid var(--accent);
-        }
-        
+        /* Kapak */
+        #kapak { text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&q=80&w=1600'); background-size: cover; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 5px solid var(--accent); }
         #kapak h1 { font-size: clamp(3em, 10vw, 5em); margin: 0; letter-spacing: 8px; color: #fcf5e5; text-shadow: 3px 3px 15px rgba(0,0,0,0.8); }
-        .btn-basla { margin-top: 40px; padding: 15px 50px; border: 2px solid #fcf5e5; background: transparent; color: #fcf5e5; cursor: pointer; transition: 0.4s; letter-spacing: 2px; }
-        .btn-basla:hover { background: #fcf5e5; color: #1a1a1a; }
+        .btn-basla { margin-top: 40px; padding: 15px 50px; border: 2px solid #fcf5e5; background: transparent; color: #fcf5e5; cursor: pointer; transition: 0.4s; }
+
+        /* Arama Paneli */
+        #search-panel { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1500; display: none; width: 300px; }
+        #search-input { width: 100%; padding: 10px 15px; border-radius: 20px; border: 2px solid var(--accent); background: var(--paper); color: var(--ink); outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
         /* Kitap Sayfası */
-        .container { 
-            max-width: 850px; 
-            margin: 40px auto 100px auto; 
-            background: var(--paper); 
-            color: var(--ink); 
-            padding: 60px; 
-            border-radius: 2px; 
-            box-shadow: 0 0 50px rgba(0,0,0,0.8); 
-            display: none; 
-            min-height: 80vh;
-            transition: background 0.5s, color 0.5s;
-        }
-        
+        .container { max-width: 850px; margin: 80px auto 100px auto; background: var(--paper); color: var(--ink); padding: 60px; border-radius: 2px; box-shadow: 0 0 50px rgba(0,0,0,0.8); display: none; min-height: 80vh; transition: 0.5s; }
         #metin-alani { font-size: 21px; line-height: 1.8; text-align: justify; white-space: pre-wrap; }
+        .highlight { background: #ffeb3b; color: black; padding: 2px; border-radius: 3px; }
 
-        /* Gece Modu Butonu */
-        .mode-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 2000;
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            width: 45px;
-            height: 45px;
-            display: none; /* Kitap açılınca görünecek */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        /* Alt Navigasyon */
-        .nav-bar { 
-            position: fixed; bottom: 0; width: 100%; 
-            background: rgba(20, 20, 20, 0.95); padding: 20px; 
-            display: none; justify-content: center; gap: 30px; align-items: center; 
-            border-top: 3px solid var(--accent); z-index: 1000;
-        }
-        
+        /* Kontroller */
+        .mode-toggle { position: fixed; top: 20px; right: 20px; z-index: 2000; background: var(--accent); color: white; border: none; padding: 10px; border-radius: 50%; cursor: pointer; width: 45px; height: 45px; display: none; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(20, 20, 20, 0.95); padding: 20px; display: none; justify-content: center; gap: 30px; align-items: center; border-top: 3px solid var(--accent); z-index: 1000; }
         .nav-btn { padding: 10px 30px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; font-weight: bold; }
-        .nav-btn:hover:not(:disabled) { background: var(--accent); color: white; }
         .nav-btn:disabled { opacity: 0.2; }
-        .sayfa-bilgi { color: white; font-size: 0.9em; letter-spacing: 1px; }
-
-        @media (max-width: 600px) { .container { padding: 30px; margin: 10px; } #metin-alani { font-size: 18px; } }
     </style>
 </head>
 <body>
 
 <button class="mode-toggle" id="modeBtn" onclick="modDegistir()">🌙</button>
+
+<div id="search-panel">
+    <input type="text" id="search-input" placeholder="Arşivde ara (Örn: Palemos)..." oninput="ara()">
+</div>
 
 <div id="kapak">
     <h1>PALEMOS ARŞİVİ</h1>
@@ -107,13 +46,12 @@
 </div>
 
 <div class="container" id="kitap-sayfasi">
-    <div style="text-align: center; margin-bottom: 40px; opacity: 0.5; font-style: italic;">~ Palemos Yazıtları ~</div>
     <div id="metin-alani">Yükleniyor...</div>
 </div>
 
 <div class="nav-bar" id="nav">
     <button id="prevBtn" class="nav-btn" onclick="sayfaDegistir(-1)">⬅ Geri</button>
-    <div class="sayfa-bilgi">SAYFA <span id="aktifSayfa">1</span> / <span id="toplamSayfa">-</span></div>
+    <div style="color: white">SAYFA <span id="aktifSayfa">1</span> / <span id="toplamSayfa">-</span></div>
     <button id="nextBtn" class="nav-btn" onclick="sayfaDegistir(1)">İleri ➡</button>
 </div>
 
@@ -126,14 +64,12 @@
         document.getElementById('kitap-sayfasi').style.display = 'block';
         document.getElementById('nav').style.display = 'flex';
         document.getElementById('modeBtn').style.display = 'block';
-        window.scrollTo(0, 0);
+        document.getElementById('search-panel').style.display = 'block';
     }
 
     function modDegistir() {
-        const body = document.body;
-        const btn = document.getElementById('modeBtn');
-        body.classList.toggle('dark-mode');
-        btn.innerText = body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        document.body.classList.toggle('dark-mode');
+        document.getElementById('modeBtn').innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
     }
 
     fetch('result.json?v=' + Date.now())
@@ -151,6 +87,22 @@
             document.getElementById('prevBtn').disabled = (aktifIndeks === 0);
             document.getElementById('nextBtn').disabled = (aktifIndeks === sayfalar.length - 1);
             window.scrollTo(0, 0);
+        }
+    }
+
+    function ara() {
+        const kelime = document.getElementById('search-input').value.toLowerCase();
+        if (kelime.length < 3) { sayfayiGoster(); return; }
+
+        for (let i = 0; i < sayfalar.length; i++) {
+            if (sayfalar[i].toLowerCase().includes(kelime)) {
+                aktifIndeks = i;
+                sayfayiGoster();
+                const icerik = document.getElementById('metin-alani').innerHTML;
+                const regex = new RegExp(`(${kelime})`, 'gi');
+                document.getElementById('metin-alani').innerHTML = icerik.replace(regex, '<span class="highlight">$1</span>');
+                break; 
+            }
         }
     }
 

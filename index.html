@@ -8,45 +8,66 @@
         :root { --bg: #1a1a1a; --paper: #fcf5e5; --ink: #2c1e14; --accent: #8e735b; }
         body.dark-mode { --paper: #2c2c2c; --ink: #e0d6c5; --bg: #121212; }
         
-        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--paper); margin: 0; transition: 0.5s; }
+        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--paper); margin: 0; transition: 0.5s; overflow-x: hidden; }
+
+        /* Yan Menü (Fihrist) */
+        #fihrist {
+            position: fixed; left: -250px; top: 0; width: 250px; height: 100%;
+            background: var(--ink); color: var(--paper); transition: 0.3s;
+            z-index: 2500; padding: 20px; box-sizing: border-box; overflow-y: auto;
+            border-right: 2px solid var(--accent);
+        }
+        #fihrist.open { left: 0; }
+        #fihrist h3 { border-bottom: 1px solid var(--accent); padding-bottom: 10px; font-size: 1.2em; }
+        .fihrist-item { padding: 10px; cursor: pointer; border-bottom: 1px solid rgba(142, 115, 91, 0.2); transition: 0.2s; font-size: 0.9em; }
+        .fihrist-item:hover { background: var(--accent); color: white; }
+
+        /* Menü Butonu */
+        #menu-btn {
+            position: fixed; top: 20px; left: 20px; z-index: 2600;
+            background: var(--accent); color: white; border: none;
+            padding: 10px 15px; cursor: pointer; display: none; border-radius: 5px;
+        }
 
         /* Kapak */
         #kapak { text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&q=80&w=1600'); background-size: cover; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 5px solid var(--accent); }
-        #kapak h1 { font-size: clamp(3em, 10vw, 5em); margin: 0; letter-spacing: 8px; color: #fcf5e5; text-shadow: 3px 3px 15px rgba(0,0,0,0.8); }
-        .btn-basla { margin-top: 40px; padding: 15px 50px; border: 2px solid #fcf5e5; background: transparent; color: #fcf5e5; cursor: pointer; transition: 0.4s; }
+        #kapak h1 { font-size: clamp(3em, 10vw, 5em); margin: 0; letter-spacing: 8px; color: #fcf5e5; }
+        .btn-basla { margin-top: 40px; padding: 15px 50px; border: 2px solid #fcf5e5; background: transparent; color: #fcf5e5; cursor: pointer; transition: 0.4s; font-size: 1.1em; }
 
-        /* Arama Paneli */
-        #search-panel { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1500; display: none; width: 300px; }
-        #search-input { width: 100%; padding: 10px 15px; border-radius: 20px; border: 2px solid var(--accent); background: var(--paper); color: var(--ink); outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        /* Arama & Kitap Alanı */
+        #search-panel { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1500; display: none; width: 250px; }
+        #search-input { width: 100%; padding: 8px 15px; border-radius: 20px; border: 2px solid var(--accent); background: var(--paper); color: var(--ink); outline: none; }
+        .container { max-width: 800px; margin: 80px auto 120px auto; background: var(--paper); color: var(--ink); padding: 50px; border-radius: 2px; box-shadow: 0 0 50px rgba(0,0,0,0.8); display: none; min-height: 80vh; }
+        #metin-alani { font-size: 20px; line-height: 1.8; text-align: justify; white-space: pre-wrap; }
+        .highlight { background: #ffeb3b; color: black; }
 
-        /* Kitap Sayfası */
-        .container { max-width: 850px; margin: 80px auto 100px auto; background: var(--paper); color: var(--ink); padding: 60px; border-radius: 2px; box-shadow: 0 0 50px rgba(0,0,0,0.8); display: none; min-height: 80vh; transition: 0.5s; }
-        #metin-alani { font-size: 21px; line-height: 1.8; text-align: justify; white-space: pre-wrap; }
-        .highlight { background: #ffeb3b; color: black; padding: 2px; border-radius: 3px; }
-
-        /* Kontroller */
-        .mode-toggle { position: fixed; top: 20px; right: 20px; z-index: 2000; background: var(--accent); color: white; border: none; padding: 10px; border-radius: 50%; cursor: pointer; width: 45px; height: 45px; display: none; }
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(20, 20, 20, 0.95); padding: 20px; display: none; justify-content: center; gap: 30px; align-items: center; border-top: 3px solid var(--accent); z-index: 1000; }
-        .nav-btn { padding: 10px 30px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; font-weight: bold; }
+        /* Alt Navigasyon */
+        .mode-toggle { position: fixed; top: 20px; right: 20px; z-index: 2000; background: var(--accent); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: none; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(20, 20, 20, 0.95); padding: 15px; display: none; justify-content: center; gap: 20px; align-items: center; border-top: 3px solid var(--accent); z-index: 1000; }
+        .nav-btn { padding: 8px 25px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
         .nav-btn:disabled { opacity: 0.2; }
-        
-        /* Kaldığın Sayfa Notu */
-        #resume-note { font-size: 0.8em; color: var(--accent); margin-top: 10px; display: none; }
     </style>
 </head>
-<body class="">
+<body>
 
+<button id="menu-btn" onclick="toggleFihrist()">☰ Fihrist</button>
 <button class="mode-toggle" id="modeBtn" onclick="modDegistir()">🌙</button>
 
+<div id="fihrist">
+    <h3>BÖLÜMLER</h3>
+    <div id="fihrist-listesi">
+        <!-- Otomatik dolacak -->
+    </div>
+</div>
+
 <div id="search-panel">
-    <input type="text" id="search-input" placeholder="Arşivde ara..." oninput="ara()">
+    <input type="text" id="search-input" placeholder="Arada ara..." oninput="ara()">
 </div>
 
 <div id="kapak">
     <h1>PALEMOS ARŞİVİ</h1>
     <p style="color: var(--accent); font-style: italic;">Anno Domini 1600</p>
     <button class="btn-basla" onclick="kitabiAc()">BELGELERİ OKU</button>
-    <div id="resume-note">En son kaldığınız yerden devam edilecektir.</div>
 </div>
 
 <div class="container" id="kitap-sayfasi">
@@ -62,16 +83,11 @@
 <script>
     let sayfalar = [];
     let aktifIndeks = parseInt(localStorage.getItem('palemos_last_page')) || 0;
-    let isDarkMode = localStorage.getItem('palemos_dark_mode') === 'true';
 
-    // Sayfa açıldığında hafızayı kontrol et
     window.onload = () => {
-        if(isDarkMode) {
+        if(localStorage.getItem('palemos_dark_mode') === 'true') {
             document.body.classList.add('dark-mode');
             document.getElementById('modeBtn').innerText = '☀️';
-        }
-        if(aktifIndeks > 0) {
-            document.getElementById('resume-note').style.display = 'block';
         }
     };
 
@@ -81,7 +97,12 @@
         document.getElementById('nav').style.display = 'flex';
         document.getElementById('modeBtn').style.display = 'block';
         document.getElementById('search-panel').style.display = 'block';
+        document.getElementById('menu-btn').style.display = 'block';
         sayfayiGoster();
+    }
+
+    function toggleFihrist() {
+        document.getElementById('fihrist').classList.toggle('open');
     }
 
     function modDegistir() {
@@ -95,23 +116,30 @@
         .then(data => {
             sayfalar = data.palemos.sayfalar;
             document.getElementById('toplamSayfa').innerText = sayfalar.length;
-            // Eğer sayfa yüklenmişse ve kapak kapalıysa göster
-            if(document.getElementById('kitap-sayfasi').style.display === 'block') {
-                sayfayiGoster();
-            }
+            fihristOlustur();
+            if(document.getElementById('kitap-sayfasi').style.display === 'block') sayfayiGoster();
         });
+
+    function fihristOlustur() {
+        const liste = document.getElementById('fihrist-listesi');
+        liste.innerHTML = "";
+        sayfalar.forEach((sayfa, index) => {
+            // İlk 30 karakteri başlık gibi alalım (veya büyük harfli kelimeleri ara)
+            const baslik = sayfa.substring(0, 30).split('\n')[0] + "...";
+            const item = document.createElement('div');
+            item.className = 'fihrist-item';
+            item.innerText = (index + 1) + ". " + baslik;
+            item.onclick = () => { aktifIndeks = index; sayfayiGoster(); toggleFihrist(); };
+            liste.appendChild(item);
+        });
+    }
 
     function sayfayiGoster() {
         if (sayfalar.length > 0) {
-            // Sınır kontrolü
-            if(aktifIndeks >= sayfalar.length) aktifIndeks = 0;
-            
             document.getElementById('metin-alani').innerText = sayfalar[aktifIndeks];
             document.getElementById('aktifSayfa').innerText = aktifIndeks + 1;
             document.getElementById('prevBtn').disabled = (aktifIndeks === 0);
             document.getElementById('nextBtn').disabled = (aktifIndeks === sayfalar.length - 1);
-            
-            // Hafızaya Kaydet
             localStorage.setItem('palemos_last_page', aktifIndeks);
             window.scrollTo(0, 0);
         }
@@ -120,11 +148,9 @@
     function ara() {
         const kelime = document.getElementById('search-input').value.toLowerCase();
         if (kelime.length < 3) { sayfayiGoster(); return; }
-
         for (let i = 0; i < sayfalar.length; i++) {
             if (sayfalar[i].toLowerCase().includes(kelime)) {
-                aktifIndeks = i;
-                sayfayiGoster();
+                aktifIndeks = i; sayfayiGoster();
                 const icerik = document.getElementById('metin-alani').innerHTML;
                 const regex = new RegExp(`(${kelime})`, 'gi');
                 document.getElementById('metin-alani').innerHTML = icerik.replace(regex, '<span class="highlight">$1</span>');

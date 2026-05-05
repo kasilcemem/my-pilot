@@ -1,8 +1,9 @@
 {
-    "tarih": "05/05/2026 06:09",
+    "tarih": "05/05/2026 06:37",
     "hava": "Sunny +84°F",
-    "liste": [
-        "liste.txt",
-        "palemos.txt"
-    ]
+    "palemos": {
+        "ozet": "Dosya okuma hatası: 'utf-8' codec can't decode byte 0x91 in position 15: invalid start byte",
+        "uzunluk": 0,
+        "hata": "Okuma Hatası"
+    }
 }

@@ -1,32 +1,17 @@
-name: Guncelleme_Motoru
-
-on:
-  workflow_dispatch:
-
+name: Palemos_Sistemi
+on: [workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    permissions: { contents: write }
     steps:
-      - name: Kodlari Cek
-        uses: actions/checkout@v3
-
-      - name: Python Kur
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Kutuphaneleri Yukle
-        run: pip install requests
-
-      - name: Python Kodunu Calistir
+      - uses: actions/checkout@v3
+      - name: Python Calistir
         run: python process.py
-
-      - name: Degisiklikleri Kaydet
+      - name: Kaydet
         run: |
-          git config --global user.name 'PanelBot'
+          git config --global user.name 'Bot'
           git config --global user.email 'bot@github.com'
           git add result.json
-          git commit -m "Otomatik guncelleme" || exit 0
+          git commit -m "Metin guncellendi" || exit 0
           git push

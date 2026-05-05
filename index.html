@@ -3,98 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palemos Editör Paneli</title>
+    <title>Palemos E-Kitap</title>
     <style>
-        :root { --bg: #f5f5f7; --card: #ffffff; --text: #1d1d1f; --accent: #007aff; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        :root { --bg: #f4ecd8; --card: #fcf5e5; --text: #5b4636; --accent: #8e735b; }
+        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
         
-        .navbar { position: sticky; top: 0; background: var(--card); padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; gap: 10px; align-items: center; z-index: 1000; flex-wrap: wrap; }
+        .navbar { background: var(--card); padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
         
-        .container { max-width: 900px; margin: 20px auto; background: var(--card); padding: 40px; border-radius: 12px; }
+        .container { max-width: 800px; margin: 20px auto; background: var(--card); padding: 50px; border-radius: 4px; box-shadow: 0 0 15px rgba(0,0,0,0.1); flex-grow: 1; position: relative; }
         
-        #metin-alani, #editor-alani { font-family: "Georgia", serif; font-size: 19px; line-height: 1.8; width: 100%; min-height: 500px; border: none; outline: none; background: transparent; }
+        #metin-alani { font-size: 20px; line-height: 1.9; text-align: justify; white-space: pre-wrap; min-height: 60vh; }
         
-        #editor-alani { display: none; background: #fafafa; border: 1px solid #ddd; padding: 10px; border-radius: 8px; color: #333; }
-
-        .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; background: var(--accent); color: white; font-weight: bold; }
-        .btn-save { background: #34c759; display: none; }
-        .btn-cancel { background: #ff3b30; display: none; }
+        .sayfa-navigasyon { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; background: var(--card); border-top: 1px solid rgba(0,0,0,0.05); }
         
-        input[type="text"] { padding: 8px; border-radius: 20px; border: 1px solid #ddd; flex-grow: 1; max-width: 200px; }
-        .highlight { background: yellow; color: black; }
+        button { padding: 10px 25px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; border-radius: 20px; font-weight: bold; transition: 0.3s; }
+        button:hover { background: var(--accent); color: white; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        .sayfa-numarasi { font-weight: bold; font-size: 1.1em; }
     </style>
 </head>
 <body>
 
 <div class="navbar">
-    <button class="btn" id="editBtn" onclick="duzenlemeyiAc()">📝 Düzenle</button>
-    <button class="btn btn-save" id="saveBtn" onclick="kaydetVeGit()">💾 Kaydet (GitHub'a Git)</button>
-    <button class="btn btn-cancel" id="cancelBtn" onclick="duzenlemeyiKapat()">❌ İptal</button>
-    
-    <input type="text" id="aramaKutusu" placeholder="Ara..." oninput="metinAra()">
-    
-    <button onclick="window.print()">🖨️ PDF</button>
+    <span>📜 Palemos Kitaplığı</span>
+    <button onclick="window.print()">🖨️ PDF Al</button>
 </div>
 
 <div class="container">
-    <h1 id="baslik">Palemos Belgesi</h1>
-    <p style="font-size: 0.8em; opacity: 0.6;">Son Güncelleme: <span id="tarih">-</span></p>
-    <hr>
-    
-    <!-- Okuma Modu -->
     <div id="metin-alani">Yükleniyor...</div>
-    
-    <!-- Düzenleme Modu -->
-    <textarea id="editor-alani"></textarea>
+</div>
+
+<div class="sayfa-navigasyon">
+    <button id="prevBtn" onclick="sayfaDegistir(-1)">⬅️ Önceki</button>
+    <span class="sayfa-numarasi">Sayfa: <span id="aktifSayfa">1</span> / <span id="toplamSayfa">-</span></span>
+    <button id="nextBtn" onclick="sayfaDegistir(1)">Sonraki ➡️</button>
 </div>
 
 <script>
-    let orijinalMetin = "";
+    let sayfalar = [];
+    let aktifIndeks = 0;
 
     fetch('result.json?v=' + Date.now())
         .then(res => res.json())
         .then(data => {
-            orijinalMetin = data.palemos.icerik;
-            document.getElementById('tarih').innerText = data.guncelleme;
-            document.getElementById('metin-alani').innerText = orijinalMetin;
-            document.getElementById('editor-alani').value = orijinalMetin;
+            // Metni yaklaşık 2000 karakterlik sayfalara böl (veya senin [SAYFA] etiketlerine göre)
+            const tamMetin = data.palemos.icerik;
+            
+            // Eğer metinde [SAYFA] etiketi yoksa, karakter sayısına göre otomatik bölüyoruz
+            if (!tamMetin.includes("[SAYFA")) {
+                sayfalar = tamMetin.match(/[\s\S]{1,2000}(?=\s|$)/g) || [tamMetin];
+            } else {
+                sayfalar = tamMetin.split(/\[SAYFA \d+\]/).filter(s => s.trim() !== "");
+            }
+
+            document.getElementById('toplamSayfa').innerText = sayfalar.length;
+            sayfayiGoster();
         });
 
-    function duzenlemeyiAc() {
-        document.getElementById('metin-alani').style.display = 'none';
-        document.getElementById('editor-alani').style.display = 'block';
-        document.getElementById('editBtn').style.display = 'none';
-        document.getElementById('saveBtn').style.display = 'inline-block';
-        document.getElementById('cancelBtn').style.display = 'inline-block';
+    function sayfayiGoster() {
+        document.getElementById('metin-alani').innerText = sayfalar[aktifIndeks];
+        document.getElementById('aktifSayfa').innerText = aktifIndeks + 1;
+        
+        // Butonları kontrol et
+        document.getElementById('prevBtn').disabled = (aktifIndeks === 0);
+        document.getElementById('nextBtn').disabled = (aktifIndeks === sayfalar.length - 1);
+        
+        // Sayfa başına kaydır
+        window.scrollTo(0, 0);
     }
 
-    function duzenlemeyiKapat() {
-        document.getElementById('metin-alani').style.display = 'block';
-        document.getElementById('editor-alani').style.display = 'none';
-        document.getElementById('editBtn').style.display = 'inline-block';
-        document.getElementById('saveBtn').style.display = 'none';
-        document.getElementById('cancelBtn').style.display = 'none';
-    }
-
-    function kaydetVeGit() {
-        const yeniMetin = document.getElementById('editor-alani').value;
-        // Metni panoya kopyala (GitHub'a yapıştırmak için kolaylık)
-        navigator.clipboard.writeText(yeniMetin).then(() => {
-            alert("Yeni metin kopyalandı! Şimdi açılacak sayfada kalem simgesine tıkla, her şeyi sil ve yapıştır.");
-            // GitHub dosya düzenleme linkine yönlendir (Buradaki kullanıcı adını ve depo adını GitHub'dan kontrol et)
-            const currentUrl = window.location.href;
-            const repoPath = currentUrl.split('.github.io/')[1] || "";
-            // Dosyanın tam yolu: data/palemos.txt
-            window.open(`https://github.com/${window.location.hostname.split('.')[0]}/${window.location.pathname.split('/')[1]}/edit/main/data/palemos.txt`, '_blank');
-        });
-    }
-
-    function metinAra() {
-        const aranan = document.getElementById('aramaKutusu').value;
-        const metinAlani = document.getElementById('metin-alani');
-        if (!aranan) { metinAlani.innerText = orijinalMetin; return; }
-        const regex = new RegExp(`(${aranan})`, 'gi');
-        metinAlani.innerHTML = orijinalMetin.replace(regex, '<span class="highlight">$1</span>');
+    function sayfaDegistir(yon) {
+        aktifIndeks += yon;
+        sayfayiGoster();
     }
 </script>
 

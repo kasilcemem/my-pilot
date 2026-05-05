@@ -1,46 +1,27 @@
 import os
 import json
-import requests
 from datetime import datetime
 
-def hava_durumu_al():
-    try:
-        r = requests.get("https://wttr.in/Kas?format=%C+%t", timeout=10)
-        return r.text.strip()
-    except:
-        return "Hava durumu alınamadı"
-
-def metin_oku():
-    # Klasör ismini kontrol edelim (Büyük/Küçük harf duyarlıdır!)
-    klasor = 'data'
-    dosya_adi = 'palemos.txt'
-    yol = os.path.join(klasor, dosya_adi)
+def palemos_islem():
+    yol = os.path.join('data', 'palemos.txt')
     
     if os.path.exists(yol):
-        try:
-            with open(yol, 'r', encoding='utf-8') as f:
-                icerik = f.read()
-                return {"ozet": icerik[:1500] + "...", "uzunluk": len(icerik), "hata": "Yok"}
-        except Exception as e:
-            return {"ozet": f"Dosya okuma hatası: {str(e)}", "uzunluk": 0, "hata": "Okuma Hatası"}
-    else:
-        # Klasördeki gerçek dosyaları listeleyelim ki hatayı anlayalım
-        mevcut_dosyalar = os.listdir(klasor) if os.path.exists(klasor) else "Klasör yok"
-        return {
-            "ozet": f"Hata: {dosya_adi} bulunamadı. Mevcut dosyalar: {mevcut_dosyalar}",
-            "uzunluk": 0, 
-            "hata": "Dosya Yok"
-        }
+        with open(yol, 'r', encoding='utf-8') as f:
+            tam_metin = f.read()
+            return {
+                "baslik": "Palemos Belgesi",
+                "icerik": tam_metin, # Tüm metni çekiyoruz
+                "karakter": len(tam_metin),
+                "durum": "Hazır"
+            }
+    return {"baslik": "Hata", "icerik": "Metin dosyası bulunamadı!", "durum": "Eksik"}
 
-# Raporu oluştur
-rapor = {
-    "tarih": datetime.now().strftime("%d/%m/%Y %H:%M"),
-    "hava": hava_durumu_al(),
-    "palemos": metin_oku()
+# Veriyi paketle
+data = {
+    "guncelleme": datetime.now().strftime("%H:%M - %d/%m/%Y"),
+    "palemos": palemos_islem()
 }
 
 # Kaydet
 with open('result.json', 'w', encoding='utf-8') as f:
-    json.dump(rapor, f, ensure_ascii=False, indent=4)
-
-print("İşlem başarıyla tamamlandı (Hatalar yakalandı).")
+    json.dump(data, f, ensure_ascii=False, indent=4)

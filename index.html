@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palemos Arşivi | 1600</title>
-    <!-- PDF Oluşturma Kütüphanesi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { --bg: #1a1a1a; --paper: #fcf5e5; --ink: #2c1e14; --accent: #8e735b; }
@@ -12,33 +11,27 @@
         
         body { font-family: 'Georgia', serif; background: var(--bg); color: var(--paper); margin: 0; transition: 0.5s; overflow-x: hidden; }
 
-        /* Fihrist Menüsü */
-        #fihrist {
-            position: fixed; left: -250px; top: 0; width: 250px; height: 100%;
-            background: var(--ink); color: var(--paper); transition: 0.3s;
-            z-index: 2500; padding: 20px; box-sizing: border-box; overflow-y: auto;
-            border-right: 2px solid var(--accent);
-        }
+        /* Üst Kontrol Paneli */
+        .top-controls { position: fixed; top: 0; width: 100%; display: none; justify-content: space-between; padding: 10px 20px; box-sizing: border-box; z-index: 2000; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); border-bottom: 1px solid var(--accent); }
+        .ctrl-btn { background: var(--accent); color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 14px; }
+
+        /* Fihrist */
+        #fihrist { position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: var(--ink); color: var(--paper); transition: 0.3s; z-index: 2500; padding: 20px; overflow-y: auto; border-right: 2px solid var(--accent); }
         #fihrist.open { left: 0; }
         .fihrist-item { padding: 10px; cursor: pointer; border-bottom: 1px solid rgba(142, 115, 91, 0.2); font-size: 0.85em; }
-        .fihrist-item:hover { background: var(--accent); color: white; }
-
-        /* Üst Kontrol Paneli */
-        .top-controls { position: fixed; top: 20px; width: 100%; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 2000; }
-        .ctrl-btn { background: var(--accent); color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; }
 
         /* Kapak */
-        #kapak { text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&q=80&w=1600'); background-size: cover; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 5px solid var(--accent); }
-        #kapak h1 { font-size: clamp(3em, 10vw, 5em); margin: 0; letter-spacing: 8px; color: #fcf5e5; }
-        .btn-basla { margin-top: 40px; padding: 15px 50px; border: 2px solid #fcf5e5; background: transparent; color: #fcf5e5; cursor: pointer; transition: 0.4s; }
+        #kapak { text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&q=80&w=1600'); background-size: cover; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .btn-basla { margin-top: 40px; padding: 15px 50px; border: 2px solid #fcf5e5; background: transparent; color: #fcf5e5; cursor: pointer; font-size: 1.1em; }
 
         /* Kitap Alanı */
-        #search-panel { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1500; display: none; width: 200px; }
-        #search-input { width: 100%; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--accent); background: var(--paper); color: var(--ink); }
-        .container { max-width: 800px; margin: 80px auto 120px auto; background: var(--paper); color: var(--ink); padding: 60px; border-radius: 2px; box-shadow: 0 0 50px rgba(0,0,0,0.8); display: none; min-height: 80vh; }
+        .container { max-width: 800px; margin: 80px auto 120px auto; background: var(--paper); color: var(--ink); padding: 50px; border-radius: 2px; box-shadow: 0 0 50px rgba(0,0,0,0.8); display: none; }
         #metin-alani { font-size: 21px; line-height: 1.8; text-align: justify; white-space: pre-wrap; }
-        .highlight { background: #ffeb3b; color: black; }
 
+        /* Not Alma Alanı */
+        #note-section { margin-top: 40px; border-top: 2px dashed var(--accent); padding-top: 20px; }
+        #note-area { width: 100%; height: 100px; background: rgba(0,0,0,0.05); border: 1px solid var(--accent); padding: 10px; font-family: sans-serif; resize: none; color: var(--ink); }
+        
         /* Navigasyon */
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(20, 20, 20, 0.95); padding: 15px; display: none; justify-content: center; gap: 20px; align-items: center; border-top: 3px solid var(--accent); z-index: 1000; }
         .nav-btn { padding: 8px 25px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
@@ -47,17 +40,18 @@
 <body>
 
 <div id="fihrist">
-    <h3 style="color:var(--accent)">PALEMOS FİHRİSTİ</h3>
+    <h3 style="color:var(--accent)">FİHRİST</h3>
     <div id="fihrist-listesi"></div>
 </div>
 
 <div class="top-controls" id="top-ctrl">
     <button class="ctrl-btn" onclick="toggleFihrist()">☰ Menü</button>
-    <div id="search-panel" style="display:block; position: static; transform: none;">
-        <input type="text" id="search-input" placeholder="Ara..." oninput="ara()">
+    <div id="audio-controls">
+        <button class="ctrl-btn" onclick="sesliOku()" id="speakBtn">🔊 Oku</button>
+        <button class="ctrl-btn" onclick="sesiDurdur()" id="stopBtn">⏹ Durdur</button>
     </div>
     <div>
-        <button class="ctrl-btn" onclick="indirPDF()" style="background: #2e7d32; margin-right: 10px;">📥 PDF</button>
+        <button class="ctrl-btn" onclick="indirPDF()" style="background: #2e7d32;">📥 PDF</button>
         <button class="ctrl-btn" id="modeBtn" onclick="modDegistir()">🌙</button>
     </div>
 </div>
@@ -68,13 +62,13 @@
     <button class="btn-basla" onclick="kitabiAc()">BELGELERİ OKU</button>
 </div>
 
-<!-- PDF'e basılacak alan burası -->
 <div class="container" id="kitap-sayfasi">
-    <div id="pdf-header" style="display:none; text-align:center; font-family:serif;">
-        <h1>PALEMOS YAZITLARI</h1>
-        <hr>
-    </div>
     <div id="metin-alani">Yükleniyor...</div>
+    
+    <div id="note-section">
+        <h4 style="margin:0 0 10px 0; color:var(--accent)">✍️ Bu Sayfaya Not Bırak:</h4>
+        <textarea id="note-area" placeholder="Notlarınızı buraya yazın, otomatik kaydedilir..."></textarea>
+    </div>
 </div>
 
 <div class="nav-bar" id="nav">
@@ -86,13 +80,7 @@
 <script>
     let sayfalar = [];
     let aktifIndeks = parseInt(localStorage.getItem('palemos_last_page')) || 0;
-
-    window.onload = () => {
-        if(localStorage.getItem('palemos_dark_mode') === 'true') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('modeBtn').innerText = '☀️';
-        }
-    };
+    const synth = window.speechSynthesis;
 
     function kitabiAc() {
         document.getElementById('kapak').style.display = 'none';
@@ -128,47 +116,47 @@
 
     function sayfayiGoster() {
         if (sayfalar.length > 0) {
-            document.getElementById('metin-alani').innerText = sayfalar[aktifIndeks];
+            sesiDurdur();
+            const metin = sayfalar[aktifIndeks];
+            document.getElementById('metin-alani').innerText = metin;
             document.getElementById('aktifSayfa').innerText = aktifIndeks + 1;
             document.getElementById('prevBtn').disabled = (aktifIndeks === 0);
             document.getElementById('nextBtn').disabled = (aktifIndeks === sayfalar.length - 1);
+            
+            // Notları yükle
+            const savedNote = localStorage.getItem('note_page_' + aktifIndeks) || "";
+            document.getElementById('note-area').value = savedNote;
+
             localStorage.setItem('palemos_last_page', aktifIndeks);
             window.scrollTo(0, 0);
         }
     }
 
-    function indirPDF() {
-        const element = document.getElementById('kitap-sayfasi');
-        const opt = {
-            margin: 1,
-            filename: 'Palemos_Arsivi_1600.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        // İndirirken gece modundaysa geçici olarak düzelt (beyaz kağıt olsun)
-        const isDark = document.body.classList.contains('dark-mode');
-        if(isDark) document.body.classList.remove('dark-mode');
-        
-        html2pdf().set(opt).from(element).save().then(() => {
-            if(isDark) document.body.classList.add('dark-mode');
-        });
+    // Not Kaydetme (Yazıldıkça kaydeder)
+    document.getElementById('note-area').oninput = (e) => {
+        localStorage.setItem('note_page_' + aktifIndeks, e.target.value);
+    };
+
+    // SESLİ OKUMA FONKSİYONLARI
+    function sesliOku() {
+        sesiDurdur();
+        const metin = sayfalar[aktifIndeks];
+        const utter = new SpeechSynthesisUtterance(metin);
+        utter.lang = 'tr-TR';
+        utter.rate = 0.9; // Biraz yavaş ve vakur bir okuma
+        synth.speak(utter);
     }
 
-    function ara() {
-        const k = document.getElementById('search-input').value.toLowerCase();
-        if (k.length < 3) { sayfayiGoster(); return; }
-        for (let i = 0; i < sayfalar.length; i++) {
-            if (sayfalar[i].toLowerCase().includes(k)) {
-                aktifIndeks = i; sayfayiGoster();
-                const icerik = document.getElementById('metin-alani').innerHTML;
-                document.getElementById('metin-alani').innerHTML = icerik.replace(new RegExp(`(${k})`, 'gi'), '<span class="highlight">$1</span>');
-                break; 
-            }
-        }
+    function sesiDurdur() {
+        synth.cancel();
     }
 
     function sayfaDegistir(yon) { aktifIndeks += yon; sayfayiGoster(); }
+
+    function indirPDF() {
+        const element = document.getElementById('kitap-sayfasi');
+        html2pdf().from(element).save('Palemos_Notlu_Arsiv.pdf');
+    }
 </script>
 
 </body>

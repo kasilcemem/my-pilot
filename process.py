@@ -1,29 +1,32 @@
 import os
 import json
+import requests
 from datetime import datetime
 
-# 1. Metin Okuma ve Düzenleme (Editör)
-def metni_isle():
-    dosya_yolu = './data/palemos.txt' # Dosyanın adını buraya yaz
-    if os.path.exists(dosya_yolu):
-        with open(dosya_yolu, 'r', encoding='utf-8') as f:
-            metin = f.read()
-            # Metnin ilk 500 karakterini özet olarak alalım
-            ozet = metin[:500] + "..."
-            karakter_sayisi = len(metin)
-            return {"ozet": ozet, "uzunluk": karakter_sayisi}
-    return {"ozet": "Dosya bulunamadı.", "uzunluk": 0}
+def hava_durumu_al():
+    # Kaş hava durumu (En basit servis)
+    try:
+        url = "https://wttr.in/Kas?format=%C+%t"
+        cevap = requests.get(url, timeout=10)
+        return cevap.text.strip()
+    except:
+        return "Hava durumu su an alinamadi"
 
-# 2. Genel Bilgiler
-dosyalar = os.listdir('./data')
-palemos_verisi = metni_isle()
+# 1. Dosyalari listele
+try:
+    dosyalar = os.listdir('./data')
+except:
+    dosyalar = ["data klasoru bulunamadi"]
 
-rapor = {
-    "guncelleme": datetime.now().strftime("%d/%m/%Y %H:%M"),
-    "toplam_dosya": len(dosyalar),
-    "palemos_detay": palemos_verisi,
-    "dosya_listesi": dosyalar
+# 2. Verileri paketle
+veriler = {
+    "tarih": datetime.now().strftime("%d/%m/%Y %H:%M"),
+    "hava": hava_durumu_al(),
+    "liste": dosyalar
 }
 
+# 3. Kaydet
 with open('result.json', 'w', encoding='utf-8') as f:
-    json.dump(rapor, f, ensure_ascii=False, indent=4)
+    json.dump(veriler, f, ensure_ascii=False, indent=4)
+
+print("Mutfak hazir, veriler result.json'a yazildi!")

@@ -1,24 +1,33 @@
-name: Veri_Isle_Ve_Goster
+name: Dijital_Panel_Guncelleyici
+
 on:
   workflow_dispatch: # Manuel çalıştırma düğmesi
 
 jobs:
-  islem:
+  islem_yap:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      
     steps:
-      - uses: actions/checkout@v3
-      - name: Python Hazırla
+      - name: Depoyu Kopyala
+        uses: actions/checkout@v3
+
+      - name: Python Kur
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - name: Kodu Calistir
+
+      - name: Gerekli Kutuphaneyi Yukle
+        run: pip install requests
+
+      - name: Verileri Isle
         run: python process.py
-      - name: Kaydet ve Yukle
+
+      - name: Sonuclari Kaydet
         run: |
-          git config --global user.name 'Otomatik_Bot'
-          git config --global user.email 'bot@github.com'
+          git config --global user.name 'GitHub Action Bot'
+          git config --global user.email 'action@github.com'
           git add result.json
-          git commit -m "Sonuç güncellendi" || exit 0
+          git commit -m "Otomatik veri guncellemesi" || exit 0
           git push

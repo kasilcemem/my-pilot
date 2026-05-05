@@ -3,76 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palemos E-Kitap</title>
+    <title>Palemos Arşivi | 1600</title>
     <style>
-        :root { --bg: #f4ecd8; --card: #fcf5e5; --text: #5b4636; --accent: #8e735b; }
-        body { font-family: 'Georgia', serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        :root { 
+            --bg: #1a1a1a; 
+            --paper: #fcf5e5; 
+            --ink: #2c1e14; 
+            --accent: #8e735b; 
+        }
         
-        .navbar { background: var(--card); padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
+        body { 
+            font-family: 'Georgia', serif; 
+            background: var(--bg); 
+            color: var(--paper); 
+            margin: 0; 
+            overflow-x: hidden;
+        }
+
+        /* Giriş Kapağı */
+        #kapak { 
+            text-align: center; 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&q=80&w=1600'); 
+            background-size: cover; 
+            background-position: center;
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            border-bottom: 5px solid var(--accent);
+        }
         
-        .container { max-width: 800px; margin: 20px auto; background: var(--card); padding: 50px; border-radius: 4px; box-shadow: 0 0 15px rgba(0,0,0,0.1); flex-grow: 1; position: relative; }
+        #kapak h1 { 
+            font-size: clamp(3em, 10vw, 5em); 
+            margin: 0; 
+            letter-spacing: 8px; 
+            color: var(--paper); 
+            text-shadow: 3px 3px 15px rgba(0,0,0,0.8);
+        }
         
-        #metin-alani { font-size: 20px; line-height: 1.9; text-align: justify; white-space: pre-wrap; min-height: 60vh; }
+        #kapak p { 
+            font-style: italic; 
+            font-size: 1.5em; 
+            color: var(--accent); 
+            margin-top: 10px;
+        }
+
+        .btn-basla { 
+            margin-top: 40px; 
+            padding: 15px 50px; 
+            font-size: 1.2em; 
+            border: 2px solid var(--paper); 
+            background: transparent; 
+            color: var(--paper); 
+            cursor: pointer; 
+            transition: 0.4s;
+            letter-spacing: 2px;
+        }
         
-        .sayfa-navigasyon { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; background: var(--card); border-top: 1px solid rgba(0,0,0,0.05); }
+        .btn-basla:hover { 
+            background: var(--paper); 
+            color: var(--bg); 
+        }
+
+        /* Kitap Sayfası Tasarımı */
+        .container { 
+            max-width: 850px; 
+            margin: 40px auto 100px auto; 
+            background: var(--paper); 
+            color: var(--ink); 
+            padding: 60px; 
+            border-radius: 2px; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.8); 
+            display: none; /* Başlangıçta gizli */
+            min-height: 80vh;
+        }
         
-        button { padding: 10px 25px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; border-radius: 20px; font-weight: bold; transition: 0.3s; }
-        button:hover { background: var(--accent); color: white; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        #metin-alani { 
+            font-size: 21px; 
+            line-height: 1.8; 
+            text-align: justify; 
+            white-space: pre-wrap; 
+            border-left: 1px solid rgba(0,0,0,0.05);
+            padding-left: 20px;
+        }
+
+        /* Alt Navigasyon Barı */
+        .nav-bar { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: rgba(20, 20, 20, 0.95); 
+            padding: 20px; 
+            display: none; /* Başlangıçta gizli */
+            justify-content: center; 
+            gap: 30px; 
+            align-items: center; 
+            border-top: 3px solid var(--accent); 
+            z-index: 1000;
+        }
         
-        .sayfa-numarasi { font-weight: bold; font-size: 1.1em; }
+        .nav-btn { 
+            padding: 10px 30px; 
+            border: 1px solid var(--accent); 
+            background: transparent; 
+            color: var(--accent); 
+            cursor: pointer; 
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        
+        .nav-btn:hover:not(:disabled) { 
+            background: var(--accent); 
+            color: white; 
+        }
+        
+        .nav-btn:disabled { 
+            opacity: 0.2; 
+            cursor: not-allowed; 
+        }
+
+        .sayfa-bilgi { 
+            color: var(--paper); 
+            font-family: sans-serif; 
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 30px; margin: 10px; }
+            #metin-alani { font-size: 18px; }
+            #kapak h1 { font-size: 2.5em; }
+        }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <span>📜 Palemos Kitaplığı</span>
-    <button onclick="window.print()">🖨️ PDF Al</button>
+<!-- GİRİŞ EKRANI -->
+<div id="kapak">
+    <h1>PALEMOS ARŞİVİ</h1>
+    <p>Anno Domini 1600</p>
+    <button class="btn-basla" onclick="kitabiAc()">BELGELERİ OKU</button>
 </div>
 
-<div class="container">
+<!-- OKUMA ALANI -->
+<div class="container" id="kitap-sayfasi">
+    <div style="text-align: center; margin-bottom: 40px; opacity: 0.5; font-style: italic;">
+        ~ Palemos Yazıtları ~
+    </div>
     <div id="metin-alani">Yükleniyor...</div>
 </div>
 
-<div class="sayfa-navigasyon">
-    <button id="prevBtn" onclick="sayfaDegistir(-1)">⬅️ Önceki</button>
-    <span class="sayfa-numarasi">Sayfa: <span id="aktifSayfa">1</span> / <span id="toplamSayfa">-</span></span>
-    <button id="nextBtn" onclick="sayfaDegistir(1)">Sonraki ➡️</button>
+<!-- KONTROLLER -->
+<div class="nav-bar" id="nav">
+    <button id="prevBtn" class="nav-btn" onclick="sayfaDegistir(-1)">⬅ Geri</button>
+    <div class="sayfa-bilgi">SAYFA <span id="aktifSayfa">1</span> / <span id="toplamSayfa">-</span></div>
+    <button id="nextBtn" class="nav-btn" onclick="sayfaDegistir(1)">İleri ➡</button>
 </div>
 
 <script>
     let sayfalar = [];
     let aktifIndeks = 0;
 
-    fetch('result.json?v=' + Date.now())
-        .then(res => res.json())
-        .then(data => {
-            // Metni yaklaşık 2000 karakterlik sayfalara böl (veya senin [SAYFA] etiketlerine göre)
-            const tamMetin = data.palemos.icerik;
-            
-            // Eğer metinde [SAYFA] etiketi yoksa, karakter sayısına göre otomatik bölüyoruz
-            if (!tamMetin.includes("[SAYFA")) {
-                sayfalar = tamMetin.match(/[\s\S]{1,2000}(?=\s|$)/g) || [tamMetin];
-            } else {
-                sayfalar = tamMetin.split(/\[SAYFA \d+\]/).filter(s => s.trim() !== "");
-            }
-
-            document.getElementById('toplamSayfa').innerText = sayfalar.length;
-            sayfayiGoster();
-        });
-
-    function sayfayiGoster() {
-        document.getElementById('metin-alani').innerText = sayfalar[aktifIndeks];
-        document.getElementById('aktifSayfa').innerText = aktifIndeks + 1;
-        
-        // Butonları kontrol et
-        document.getElementById('prevBtn').disabled = (aktifIndeks === 0);
-        document.getElementById('nextBtn').disabled = (aktifIndeks === sayfalar.length - 1);
-        
-        // Sayfa başına kaydır
+    // Kitabı açan fonksiyon
+    function kitabiAc() {
+        document.getElementById('kapak').style.display = 'none';
+        document.getElementById('kitap-sayfasi').style.display = 'block';
+        document.getElementById('nav').style.display = 'flex';
         window.scrollTo(0, 0);
     }
 
+    // Veriyi çek
+    fetch('result.json?v=' + Date.now())
+        .then(res => res.json())
+        .then(data => {
+            sayfalar = data.palemos.sayfalar;
+            document.getElementById('toplamSayfa').innerText = sayfalar.length;
+            sayfayiGoster();
+        })
+        .catch(err => {
+            document.getElementById('metin-alani').innerText = "Veri yüklenemedi. Lütfen Actions kısmından kodun çalışıp çalışmadığını kontrol edin.";
+        });
+
+    // Sayfayı ekrana bas
+    function sayfayiGoster() {
+        if (sayfalar.length > 0) {
+            document.getElementById('metin-alani').innerText = sayfalar[aktifIndeks];
+            document.getElementById('aktifSayfa').innerText = aktifIndeks + 1;
+            
+            // Buton durumlarını güncelle
+            document.getElementById('prevBtn').disabled = (aktifIndeks === 0);
+            document.getElementById('nextBtn').disabled = (aktifIndeks === sayfalar.length - 1);
+            
+            // Sayfa başına dön
+            window.scrollTo(0, 0);
+        }
+    }
+
+    // Sayfa değiştirme motoru
     function sayfaDegistir(yon) {
         aktifIndeks += yon;
         sayfayiGoster();

@@ -2,42 +2,93 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Palemos Okuma Paneli</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palemos Dijital Kütüphane</title>
     <style>
-        body { font-family: 'Georgia', serif; background: #fdfdfd; color: #222; line-height: 1.8; margin: 0; padding: 40px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 50px; box-shadow: 0 0 20px rgba(0,0,0,0.05); border-radius: 8px; }
-        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; font-size: 2.5em; }
-        .meta { color: #888; font-size: 0.9em; margin-bottom: 30px; }
-        #metin { white-space: pre-wrap; font-size: 1.1em; text-align: justify; }
-        .islem-cubugu { position: sticky; top: 0; background: white; padding: 10px 0; border-bottom: 1px solid #eee; margin-bottom: 20px; display: flex; gap: 10px; }
-        button { cursor: pointer; padding: 8px 15px; background: #333; color: white; border: none; border-radius: 4px; }
+        :root { --bg: #f5f5f7; --card: #ffffff; --text: #1d1d1f; }
+        body.sepia { --bg: #f4ecd8; --card: #fcf5e5; --text: #5b4636; }
+        body.dark { --bg: #1c1c1e; --card: #2c2c2e; --text: #f5f5f7; }
+
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; }
+        
+        .navbar { position: sticky; top: 0; background: var(--card); padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: center; z-index: 1000; }
+        
+        .container { max-width: 900px; margin: 30px auto; background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        
+        #metin-alani { font-family: "Georgia", serif; font-size: 19px; line-height: 1.8; text-align: justify; white-space: pre-wrap; margin-top: 20px; }
+        
+        input[type="text"] { padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; width: 250px; outline: none; }
+        
+        button { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; background: #007aff; color: white; font-weight: 500; transition: 0.2s; }
+        button:hover { opacity: 0.8; }
+        button.secondary { background: #8e8e93; }
+
+        .highlight { background-color: yellow; color: black; font-weight: bold; }
+        .controls { display: flex; gap: 5px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="islem-cubugu">
-            <button onclick="window.print()">🖨️ PDF Olarak Kaydet</button>
-            <button onclick="alert('Düzenleme modu yakında eklenecek!')">📝 Düzenle</button>
-        </div>
-        
-        <h1 id="baslik">Yükleniyor...</h1>
-        <div class="meta">Son Güncelleme: <span id="tarih">-</span> | <span id="karakter">0</span> Karakter</div>
-        
-        <div id="metin">Lütfen bekleyin, döküman hazırlanıyor...</div>
-    </div>
 
-    <script>
-        fetch('result.json?v=' + Date.now())
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('baslik').innerText = data.palemos.baslik;
-                document.getElementById('tarih').innerText = data.guncelleme;
-                document.getElementById('karakter').innerText = data.palemos.karakter;
-                document.getElementById('metin').innerText = data.palemos.icerik;
-            })
-            .catch(err => {
-                document.getElementById('metin').innerText = "Veri yüklenemedi. Lütfen Actions'tan motoru çalıştırın.";
-            });
-    </script>
+<div class="navbar">
+    <input type="text" id="aramaKutusu" placeholder="Metinde ara..." oninput="metinAra()">
+    <div class="controls">
+        <button onclick="fontDegistir(1)">A+</button>
+        <button onclick="fontDegistir(-1)">A-</button>
+    </div>
+    <div class="controls">
+        <button class="secondary" onclick="temaDegistir('white')">☀️</button>
+        <button class="secondary" onclick="temaDegistir('sepia')">📖</button>
+        <button class="secondary" onclick="temaDegistir('dark')">🌙</button>
+    </div>
+    <button onclick="window.print()">🖨️ PDF Yap</button>
+</div>
+
+<div class="container">
+    <h1 id="baslik">Palemos Belgesi</h1>
+    <p style="font-size: 0.8em; opacity: 0.7;">Son Güncelleme: <span id="tarih">-</span> | <span id="karakter">0</span> Karakter</p>
+    <hr>
+    <div id="metin-alani">Yükleniyor...</div>
+</div>
+
+<script>
+    let orijinalMetin = "";
+    let fontSize = 19;
+
+    // Veriyi Çek
+    fetch('result.json?v=' + Date.now())
+        .then(res => res.json())
+        .then(data => {
+            orijinalMetin = data.palemos.icerik;
+            document.getElementById('tarih').innerText = data.guncelleme;
+            document.getElementById('karakter').innerText = data.palemos.karakter;
+            document.getElementById('metin-alani').innerText = orijinalMetin;
+        });
+
+    // Arama Fonksiyonu
+    function metinAra() {
+        const aranan = document.getElementById('aramaKutusu').value;
+        const metinAlani = document.getElementById('metin-alani');
+        
+        if (!aranan || aranan.length < 2) {
+            metinAlani.innerText = orijinalMetin;
+            return;
+        }
+
+        const regex = new RegExp(`(${aranan})`, 'gi');
+        const yeniMetin = orijinalMetin.replace(regex, '<span class="highlight">$1</span>');
+        metinAlani.innerHTML = yeniMetin;
+    }
+
+    // Görünüm Ayarları
+    function fontDegistir(deger) {
+        fontSize += deger;
+        document.getElementById('metin-alani').style.fontSize = fontSize + "px";
+    }
+
+    function temaDegistir(tema) {
+        document.body.className = (tema === 'white') ? '' : tema;
+    }
+</script>
+
 </body>
 </html>

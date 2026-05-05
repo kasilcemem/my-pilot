@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palemos Arşivi | 1600</title>
+    <!-- PDF Oluşturma Kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { --bg: #1a1a1a; --paper: #fcf5e5; --ink: #2c1e14; --accent: #8e735b; }
         body.dark-mode { --paper: #2c2c2c; --ink: #e0d6c5; --bg: #121212; }
         
         body { font-family: 'Georgia', serif; background: var(--bg); color: var(--paper); margin: 0; transition: 0.5s; overflow-x: hidden; }
 
-        /* Yan Menü (Fihrist) */
+        /* Fihrist Menüsü */
         #fihrist {
             position: fixed; left: -250px; top: 0; width: 250px; height: 100%;
             background: var(--ink); color: var(--paper); transition: 0.3s;
@@ -18,50 +20,46 @@
             border-right: 2px solid var(--accent);
         }
         #fihrist.open { left: 0; }
-        #fihrist h3 { border-bottom: 1px solid var(--accent); padding-bottom: 10px; font-size: 1.2em; }
-        .fihrist-item { padding: 10px; cursor: pointer; border-bottom: 1px solid rgba(142, 115, 91, 0.2); transition: 0.2s; font-size: 0.9em; }
+        .fihrist-item { padding: 10px; cursor: pointer; border-bottom: 1px solid rgba(142, 115, 91, 0.2); font-size: 0.85em; }
         .fihrist-item:hover { background: var(--accent); color: white; }
 
-        /* Menü Butonu */
-        #menu-btn {
-            position: fixed; top: 20px; left: 20px; z-index: 2600;
-            background: var(--accent); color: white; border: none;
-            padding: 10px 15px; cursor: pointer; display: none; border-radius: 5px;
-        }
+        /* Üst Kontrol Paneli */
+        .top-controls { position: fixed; top: 20px; width: 100%; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 2000; }
+        .ctrl-btn { background: var(--accent); color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; }
 
         /* Kapak */
         #kapak { text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&q=80&w=1600'); background-size: cover; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 5px solid var(--accent); }
         #kapak h1 { font-size: clamp(3em, 10vw, 5em); margin: 0; letter-spacing: 8px; color: #fcf5e5; }
-        .btn-basla { margin-top: 40px; padding: 15px 50px; border: 2px solid #fcf5e5; background: transparent; color: #fcf5e5; cursor: pointer; transition: 0.4s; font-size: 1.1em; }
+        .btn-basla { margin-top: 40px; padding: 15px 50px; border: 2px solid #fcf5e5; background: transparent; color: #fcf5e5; cursor: pointer; transition: 0.4s; }
 
-        /* Arama & Kitap Alanı */
-        #search-panel { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1500; display: none; width: 250px; }
-        #search-input { width: 100%; padding: 8px 15px; border-radius: 20px; border: 2px solid var(--accent); background: var(--paper); color: var(--ink); outline: none; }
-        .container { max-width: 800px; margin: 80px auto 120px auto; background: var(--paper); color: var(--ink); padding: 50px; border-radius: 2px; box-shadow: 0 0 50px rgba(0,0,0,0.8); display: none; min-height: 80vh; }
-        #metin-alani { font-size: 20px; line-height: 1.8; text-align: justify; white-space: pre-wrap; }
+        /* Kitap Alanı */
+        #search-panel { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1500; display: none; width: 200px; }
+        #search-input { width: 100%; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--accent); background: var(--paper); color: var(--ink); }
+        .container { max-width: 800px; margin: 80px auto 120px auto; background: var(--paper); color: var(--ink); padding: 60px; border-radius: 2px; box-shadow: 0 0 50px rgba(0,0,0,0.8); display: none; min-height: 80vh; }
+        #metin-alani { font-size: 21px; line-height: 1.8; text-align: justify; white-space: pre-wrap; }
         .highlight { background: #ffeb3b; color: black; }
 
-        /* Alt Navigasyon */
-        .mode-toggle { position: fixed; top: 20px; right: 20px; z-index: 2000; background: var(--accent); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: none; }
+        /* Navigasyon */
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(20, 20, 20, 0.95); padding: 15px; display: none; justify-content: center; gap: 20px; align-items: center; border-top: 3px solid var(--accent); z-index: 1000; }
         .nav-btn { padding: 8px 25px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
-        .nav-btn:disabled { opacity: 0.2; }
     </style>
 </head>
 <body>
 
-<button id="menu-btn" onclick="toggleFihrist()">☰ Fihrist</button>
-<button class="mode-toggle" id="modeBtn" onclick="modDegistir()">🌙</button>
-
 <div id="fihrist">
-    <h3>BÖLÜMLER</h3>
-    <div id="fihrist-listesi">
-        <!-- Otomatik dolacak -->
-    </div>
+    <h3 style="color:var(--accent)">PALEMOS FİHRİSTİ</h3>
+    <div id="fihrist-listesi"></div>
 </div>
 
-<div id="search-panel">
-    <input type="text" id="search-input" placeholder="Arada ara..." oninput="ara()">
+<div class="top-controls" id="top-ctrl">
+    <button class="ctrl-btn" onclick="toggleFihrist()">☰ Menü</button>
+    <div id="search-panel" style="display:block; position: static; transform: none;">
+        <input type="text" id="search-input" placeholder="Ara..." oninput="ara()">
+    </div>
+    <div>
+        <button class="ctrl-btn" onclick="indirPDF()" style="background: #2e7d32; margin-right: 10px;">📥 PDF</button>
+        <button class="ctrl-btn" id="modeBtn" onclick="modDegistir()">🌙</button>
+    </div>
 </div>
 
 <div id="kapak">
@@ -70,7 +68,12 @@
     <button class="btn-basla" onclick="kitabiAc()">BELGELERİ OKU</button>
 </div>
 
+<!-- PDF'e basılacak alan burası -->
 <div class="container" id="kitap-sayfasi">
+    <div id="pdf-header" style="display:none; text-align:center; font-family:serif;">
+        <h1>PALEMOS YAZITLARI</h1>
+        <hr>
+    </div>
     <div id="metin-alani">Yükleniyor...</div>
 </div>
 
@@ -95,15 +98,11 @@
         document.getElementById('kapak').style.display = 'none';
         document.getElementById('kitap-sayfasi').style.display = 'block';
         document.getElementById('nav').style.display = 'flex';
-        document.getElementById('modeBtn').style.display = 'block';
-        document.getElementById('search-panel').style.display = 'block';
-        document.getElementById('menu-btn').style.display = 'block';
+        document.getElementById('top-ctrl').style.display = 'flex';
         sayfayiGoster();
     }
 
-    function toggleFihrist() {
-        document.getElementById('fihrist').classList.toggle('open');
-    }
+    function toggleFihrist() { document.getElementById('fihrist').classList.toggle('open'); }
 
     function modDegistir() {
         const isDark = document.body.classList.toggle('dark-mode');
@@ -116,23 +115,16 @@
         .then(data => {
             sayfalar = data.palemos.sayfalar;
             document.getElementById('toplamSayfa').innerText = sayfalar.length;
-            fihristOlustur();
+            const liste = document.getElementById('fihrist-listesi');
+            sayfalar.forEach((s, i) => {
+                const item = document.createElement('div');
+                item.className = 'fihrist-item';
+                item.innerText = (i + 1) + ". " + s.substring(0, 25) + "...";
+                item.onclick = () => { aktifIndeks = i; sayfayiGoster(); toggleFihrist(); };
+                liste.appendChild(item);
+            });
             if(document.getElementById('kitap-sayfasi').style.display === 'block') sayfayiGoster();
         });
-
-    function fihristOlustur() {
-        const liste = document.getElementById('fihrist-listesi');
-        liste.innerHTML = "";
-        sayfalar.forEach((sayfa, index) => {
-            // İlk 30 karakteri başlık gibi alalım (veya büyük harfli kelimeleri ara)
-            const baslik = sayfa.substring(0, 30).split('\n')[0] + "...";
-            const item = document.createElement('div');
-            item.className = 'fihrist-item';
-            item.innerText = (index + 1) + ". " + baslik;
-            item.onclick = () => { aktifIndeks = index; sayfayiGoster(); toggleFihrist(); };
-            liste.appendChild(item);
-        });
-    }
 
     function sayfayiGoster() {
         if (sayfalar.length > 0) {
@@ -145,24 +137,38 @@
         }
     }
 
+    function indirPDF() {
+        const element = document.getElementById('kitap-sayfasi');
+        const opt = {
+            margin: 1,
+            filename: 'Palemos_Arsivi_1600.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        // İndirirken gece modundaysa geçici olarak düzelt (beyaz kağıt olsun)
+        const isDark = document.body.classList.contains('dark-mode');
+        if(isDark) document.body.classList.remove('dark-mode');
+        
+        html2pdf().set(opt).from(element).save().then(() => {
+            if(isDark) document.body.classList.add('dark-mode');
+        });
+    }
+
     function ara() {
-        const kelime = document.getElementById('search-input').value.toLowerCase();
-        if (kelime.length < 3) { sayfayiGoster(); return; }
+        const k = document.getElementById('search-input').value.toLowerCase();
+        if (k.length < 3) { sayfayiGoster(); return; }
         for (let i = 0; i < sayfalar.length; i++) {
-            if (sayfalar[i].toLowerCase().includes(kelime)) {
+            if (sayfalar[i].toLowerCase().includes(k)) {
                 aktifIndeks = i; sayfayiGoster();
                 const icerik = document.getElementById('metin-alani').innerHTML;
-                const regex = new RegExp(`(${kelime})`, 'gi');
-                document.getElementById('metin-alani').innerHTML = icerik.replace(regex, '<span class="highlight">$1</span>');
+                document.getElementById('metin-alani').innerHTML = icerik.replace(new RegExp(`(${k})`, 'gi'), '<span class="highlight">$1</span>');
                 break; 
             }
         }
     }
 
-    function sayfaDegistir(yon) {
-        aktifIndeks += yon;
-        sayfayiGoster();
-    }
+    function sayfaDegistir(yon) { aktifIndeks += yon; sayfayiGoster(); }
 </script>
 
 </body>

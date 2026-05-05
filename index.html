@@ -1,1 +1,18 @@
-
+<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; text-align: center;">
+    <h1>Frekans Analiz Paneli</h1>
+    <div id="sonuc">Veriler yükleniyor...</div>
+    <script>
+        fetch('results.json')
+            .then(res => res.json())
+            .then(data => {
+                let tablo = '<table border="1" style="margin:auto"><tr><th>Nokta</th><th>Değer</th><th>Değişim</th></tr>';
+                data.forEach(d => {
+                    tablo += `<tr><td>${d.nokta}</td><td>${d.deger}</td><td>${d.fark}</td></tr>`;
+                });
+                document.getElementById('sonuc').innerHTML = tablo + '</table>';
+            });
+    </script>
+</body>
+</html>

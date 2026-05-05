@@ -3,46 +3,43 @@ import json
 import re
 from datetime import datetime
 
-def imla_ve_ozel_duzeltme(metin):
+def imla_duzelt(metin):
     if not metin: return ""
-    
-    # 1. "Dil Yazısı" ibaresini "ÖNSÖZ" olarak değiştir
-    # (Büyük/küçük harf duyarlılığını ortadan kaldırmak için re.IGNORECASE kullanıyoruz)
-    metin = re.sub(r'dil yazısı', 'ÖNSÖZ', metin, flags=re.IGNORECASE)
-    
-    # 2. Gereksiz çift boşlukları temizle
     metin = re.sub(r' +', ' ', metin).strip()
-    
-    # 3. Nokta, soru işareti ve ünlemden sonra büyük harf kontrolü
     metin = re.compile(r'([.!?]\s+)([a-zğüşıöç])').sub(lambda m: m.group(1) + m.group(2).upper(), metin)
-    
-    # 4. Metnin en başındaki ilk harfi büyük yap
     if len(metin) > 0:
         metin = metin[0].upper() + metin[1:]
-    
-    # 5. İşaretlerden önceki boşlukları sil
     metin = re.sub(r'\s+([.!?])', r'\1', metin)
-    
     return metin
 
 def calistir():
-    yol = os.path.join('data', 'palemos.txt')
-    icerik = ""
+    data_klasoru = 'data'
+    ana_metin_yolu = os.path.join(data_klasoru, 'palemos.txt')
+    onsoz_yolu = os.path.join(data_klasoru, 'onsoz.txt')
     
-    if os.path.exists(yol):
-        with open(yol, 'r', encoding='utf-8', errors='ignore') as f:
-            ham_metin = f.read()
-            # Hem imla düzelir hem de "Dil Yazısı" -> "ÖNSÖZ" olur
-            icerik = imla_ve_ozel_duzeltme(ham_metin)
-    
-    # 2000 karakterde bir sayfalandır
-    sayfalar = re.findall(r'[\s\S]{1,2000}(?=\s|$)', icerik) if icerik else ["Metin yüklenirken bir hata oluştu."]
+    tam_icerik = ""
+
+    # 1. Önce Önsözü Oku ve Düzenle
+    if os.path.exists(onsoz_yolu):
+        with open(onsoz_yolu, 'r', encoding='utf-8', errors='ignore') as f:
+            onsoz_ham = f.read()
+            # "Dil" başlığını temizleyip "ÖNSÖZ" yapalım
+            onsoz_temiz = re.sub(r'^dil\b', '', onsoz_ham, flags=re.IGNORECASE).strip()
+            tam_icerik += "ÖNSÖZ\n\n" + imla_duzelt(onsoz_temiz) + "\n\n---\n\n"
+
+    # 2. Sonra Ana Metni Oku ve Ekle
+    if os.path.exists(ana_metin_yolu):
+        with open(ana_metin_yolu, 'r', encoding='utf-8', errors='ignore') as f:
+            ana_ham = f.read()
+            tam_icerik += imla_duzelt(ana_ham)
+
+    # Sayfalandırma (2000 karakterlik bloklar)
+    sayfalar = re.findall(r'[\s\S]{1,2000}(?=\s|$)', tam_icerik) if tam_icerik else ["Metin bulunamadı."]
     
     sonuc = {
         "guncelleme": datetime.now().strftime("%d/%m/%Y %H:%M"),
         "palemos": {
-            "baslik": "Palemos Arşivi",
-            "icerik": icerik,
+            "baslik": "Palemos Arşivi (1600)",
             "sayfalar": sayfalar,
             "toplam_sayfa": len(sayfalar)
         }

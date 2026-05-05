@@ -1,7 +1,7 @@
 name: Guncelleme_Motoru
 
 on:
-  workflow_dispatch: # Biz dugmeye basinca calis
+  workflow_dispatch:
 
 jobs:
   calistir:
@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.9'
       - name: Gerekli Araclari Yukle
-        run: pip install requests
+        run: pip install requests  # İşte eksik olan parça buydu!
       - name: Kodu Calistir
         run: python process.py
       - name: Sonuclari Kaydet

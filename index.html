@@ -1,20 +1,39 @@
-<!-- HTML içindeki script kısmını şu şekilde güncelle -->
-<script>
-    fetch('result.json')
-        .then(response => response.json())
-        .then(data => {
-            const panel = document.getElementById('liste');
-            
-            // Palemos Özeti Kısmı
-            let div = document.createElement('div');
-            div.innerHTML = `
-                <h3>📖 Palemos Döküman Özeti</h3>
-                <p><i>Toplam Karakter: ${data.palemos_detay.uzunluk}</i></p>
-                <div style="background:#eee; padding:15px; text-align:left; border-left:5px solid #333;">
-                    ${data.palemos_detay.ozet}
-                </div>
-                <button onclick="alert('Tam metin editör moduna yakında geçilecek!')">Düzenlemeye Başla</button>
-            `;
-            panel.appendChild(div);
-        });
-</script>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dijital Panelim</title>
+</head>
+<body style="font-family: Arial; text-align: center; background: #eef2f3; padding: 50px;">
+    <div style="background: white; display: inline-block; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+        <h1 style="color: #333;">🏠 Panelim</h1>
+        <hr>
+        <p><strong>📍 Konum:</strong> Kaş / Antalya</p>
+        <p><strong>🌡️ Hava:</strong> <span id="hava">Yükleniyor...</span></p>
+        <p><strong>📅 Güncelleme:</strong> <span id="tarih">-</span></p>
+        <hr>
+        <h3>📁 Dosyalarım:</h3>
+        <ul id="liste" style="text-align: left; list-style: none; padding: 0;"></ul>
+    </div>
+
+    <script>
+        // Sayfa acildiginda result.json dosyasini oku
+        fetch('result.json')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('hava').innerText = data.hava;
+                document.getElementById('tarih').innerText = data.tarih;
+                const listeUl = document.getElementById('liste');
+                data.liste.forEach(dosya => {
+                    let li = document.createElement('li');
+                    li.innerText = "📄 " + dosya;
+                    li.style.padding = "5px";
+                    listeUl.appendChild(li);
+                });
+            })
+            .catch(err => {
+                document.getElementById('hava').innerText = "Veri dosyası henüz oluşmamış.";
+            });
+    </script>
+</body>
+</html>

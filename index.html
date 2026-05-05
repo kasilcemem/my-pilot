@@ -2,38 +2,42 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Palemos Kontrol Paneli</title>
+    <title>Palemos Panel</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; text-align: center; }
-        .box { background: white; max-width: 700px; margin: auto; padding: 20px; border-radius: 10px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .metin { text-align: left; background: #fafafa; padding: 15px; border: 1px solid #ddd; white-space: pre-wrap; height: 300px; overflow-y: auto; }
+        body { font-family: sans-serif; background: #2c3e50; color: white; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: white; color: #333; padding: 20px; border-radius: 15px; width: 90%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .metin-kutusu { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; height: 300px; overflow-y: auto; text-align: left; white-space: pre-wrap; color: #444; }
+        .hata { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h1>🏠 Palemos Dijital Panel</h1>
-        <p><b>📍 Konum:</b> Kaş / Antalya</p>
-        <p><b>🌡️ Hava:</b> <span id="hava">...</span></p>
+    <div class="card">
+        <h2>📊 Palemos Dijital Panel</h2>
+        <p>🌡️ Hava Durumu: <b id="hava">Yükleniyor...</b></p>
         <hr>
-        <h3>📖 Palemos Metin (70 Sayfa)</h3>
-        <div id="metin-alani" class="metin">Yükleniyor...</div>
+        <div id="metin-alani" class="metin-kutusu">Veriler bekleniyor...</div>
+        <p style="font-size: 0.8em; color: #999; margin-top: 10px;">Son Güncelleme: <span id="tarih">-</span></p>
     </div>
 
     <script>
-        // Dosyayı taze çekmek için sonuna sayı ekliyoruz (Cache temizliği)
-        fetch('result.json?v=' + Math.random())
+        // Dosyayı her zaman en taze haliyle çekmek için rastgele sayı ekliyoruz
+        fetch('result.json?v=' + Date.now())
             .then(res => {
-                if(!res.ok) throw new Error("result.json bulunamadı! Lütfen Actions'tan Run Workflow yapın.");
+                if(!res.ok) throw new Error("result.json dosyası bulunamadı! Lütfen Actions sekmesinden motoru çalıştırın.");
                 return res.json();
             })
             .then(data => {
                 document.getElementById('hava').innerText = data.hava || "Veri yok";
-                if(data.palemos) {
+                document.getElementById('tarih').innerText = data.tarih || "-";
+                
+                if(data.palemos && data.palemos.ozet) {
                     document.getElementById('metin-alani').innerText = data.palemos.ozet;
+                } else {
+                    document.getElementById('metin-alani').innerText = "Metin içeriği boş veya hatalı.";
                 }
             })
             .catch(err => {
-                document.getElementById('metin-alani').innerHTML = "<b style='color:red'>HATA:</b> " + err.message;
+                document.getElementById('metin-alani').innerHTML = "<span class='hata'>HATA:</span> " + err.message;
             });
     </script>
 </body>

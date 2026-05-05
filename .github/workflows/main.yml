@@ -4,24 +4,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  calistir:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
-      - name: Python Hazirla
+      - name: Kodlari Cek
+        uses: actions/checkout@v3
+
+      - name: Python Kur
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - name: Gerekli Araclari Yukle
-        run: pip install requests  # İşte eksik olan parça buydu!
-      - name: Kodu Calistir
+
+      - name: Kutuphaneleri Yukle
+        run: pip install requests
+
+      - name: Python Kodunu Calistir
         run: python process.py
-      - name: Sonuclari Kaydet
+
+      - name: Degisiklikleri Kaydet
         run: |
           git config --global user.name 'PanelBot'
           git config --global user.email 'bot@github.com'
           git add result.json
-          git commit -m "Veriler yenilendi" || exit 0
+          git commit -m "Otomatik guncelleme" || exit 0
           git push

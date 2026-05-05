@@ -1,33 +1,27 @@
-name: Dijital_Panel_Guncelleyici
+name: Guncelleme_Motoru
 
 on:
-  workflow_dispatch: # Manuel çalıştırma düğmesi
+  workflow_dispatch: # Biz dugmeye basinca calis
 
 jobs:
-  islem_yap:
+  calistir:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      
     steps:
-      - name: Depoyu Kopyala
-        uses: actions/checkout@v3
-
-      - name: Python Kur
+      - uses: actions/checkout@v3
+      - name: Python Hazirla
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-
-      - name: Gerekli Kutuphaneyi Yukle
+      - name: Gerekli Araclari Yukle
         run: pip install requests
-
-      - name: Verileri Isle
+      - name: Kodu Calistir
         run: python process.py
-
       - name: Sonuclari Kaydet
         run: |
-          git config --global user.name 'GitHub Action Bot'
-          git config --global user.email 'action@github.com'
+          git config --global user.name 'PanelBot'
+          git config --global user.email 'bot@github.com'
           git add result.json
-          git commit -m "Otomatik veri guncellemesi" || exit 0
+          git commit -m "Veriler yenilendi" || exit 0
           git push

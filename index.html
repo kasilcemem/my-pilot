@@ -2,42 +2,41 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Palemos Panel</title>
+    <title>Palemos Okuma Paneli</title>
     <style>
-        body { font-family: sans-serif; background: #2c3e50; color: white; display: flex; justify-content: center; padding-top: 50px; }
-        .card { background: white; color: #333; padding: 20px; border-radius: 15px; width: 90%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .metin-kutusu { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; height: 300px; overflow-y: auto; text-align: left; white-space: pre-wrap; color: #444; }
-        .hata { color: red; font-weight: bold; }
+        body { font-family: 'Georgia', serif; background: #fdfdfd; color: #222; line-height: 1.8; margin: 0; padding: 40px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 50px; box-shadow: 0 0 20px rgba(0,0,0,0.05); border-radius: 8px; }
+        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; font-size: 2.5em; }
+        .meta { color: #888; font-size: 0.9em; margin-bottom: 30px; }
+        #metin { white-space: pre-wrap; font-size: 1.1em; text-align: justify; }
+        .islem-cubugu { position: sticky; top: 0; background: white; padding: 10px 0; border-bottom: 1px solid #eee; margin-bottom: 20px; display: flex; gap: 10px; }
+        button { cursor: pointer; padding: 8px 15px; background: #333; color: white; border: none; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>📊 Palemos Dijital Panel</h2>
-        <p>🌡️ Hava Durumu: <b id="hava">Yükleniyor...</b></p>
-        <hr>
-        <div id="metin-alani" class="metin-kutusu">Veriler bekleniyor...</div>
-        <p style="font-size: 0.8em; color: #999; margin-top: 10px;">Son Güncelleme: <span id="tarih">-</span></p>
+    <div class="container">
+        <div class="islem-cubugu">
+            <button onclick="window.print()">🖨️ PDF Olarak Kaydet</button>
+            <button onclick="alert('Düzenleme modu yakında eklenecek!')">📝 Düzenle</button>
+        </div>
+        
+        <h1 id="baslik">Yükleniyor...</h1>
+        <div class="meta">Son Güncelleme: <span id="tarih">-</span> | <span id="karakter">0</span> Karakter</div>
+        
+        <div id="metin">Lütfen bekleyin, döküman hazırlanıyor...</div>
     </div>
 
     <script>
-        // Dosyayı her zaman en taze haliyle çekmek için rastgele sayı ekliyoruz
         fetch('result.json?v=' + Date.now())
-            .then(res => {
-                if(!res.ok) throw new Error("result.json dosyası bulunamadı! Lütfen Actions sekmesinden motoru çalıştırın.");
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                document.getElementById('hava').innerText = data.hava || "Veri yok";
-                document.getElementById('tarih').innerText = data.tarih || "-";
-                
-                if(data.palemos && data.palemos.ozet) {
-                    document.getElementById('metin-alani').innerText = data.palemos.ozet;
-                } else {
-                    document.getElementById('metin-alani').innerText = "Metin içeriği boş veya hatalı.";
-                }
+                document.getElementById('baslik').innerText = data.palemos.baslik;
+                document.getElementById('tarih').innerText = data.guncelleme;
+                document.getElementById('karakter').innerText = data.palemos.karakter;
+                document.getElementById('metin').innerText = data.palemos.icerik;
             })
             .catch(err => {
-                document.getElementById('metin-alani').innerHTML = "<span class='hata'>HATA:</span> " + err.message;
+                document.getElementById('metin').innerText = "Veri yüklenemedi. Lütfen Actions'tan motoru çalıştırın.";
             });
     </script>
 </body>

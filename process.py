@@ -3,25 +3,23 @@ import json
 from datetime import datetime
 
 def calistir():
-    # Dosya yollarını tanımla
     yol = os.path.join('data', 'palemos.txt')
-    
-    # Varsayılan içerik
     icerik = "Metin okunamadı."
     karakter = 0
     
-    # Dosyayı oku
     if os.path.exists(yol):
-        try:
-            with open(yol, 'r', encoding='utf-8') as f:
-                icerik = f.read()
-                karakter = len(icerik)
-        except Exception as e:
-            icerik = f"Okuma hatası: {str(e)}"
+        # Farklı dil kodlamalarını sırayla dene (UTF-8, Latin-1, Windows-1254)
+        for kodlama in ['utf-8', 'latin-1', 'iso-8859-9', 'cp1254']:
+            try:
+                with open(yol, 'r', encoding=kodlama) as f:
+                    icerik = f.read()
+                    karakter = len(icerik)
+                    break # Başarılı olursa döngüden çık
+            except:
+                continue
     else:
         icerik = "Hata: data/palemos.txt bulunamadı!"
 
-    # Sonuçları hazırla
     sonuc = {
         "guncelleme": datetime.now().strftime("%d/%m/%Y %H:%M"),
         "palemos": {
@@ -31,7 +29,6 @@ def calistir():
         }
     }
 
-    # result.json dosyasına yaz
     with open('result.json', 'w', encoding='utf-8') as f:
         json.dump(sonuc, f, ensure_ascii=False, indent=4)
 

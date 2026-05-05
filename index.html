@@ -1,25 +1,40 @@
-<script>
-    // Sayfa her açıldığında veriyi taze çekmesi için sonuna küçük bir tarih kodu ekliyoruz
-    fetch('result.json?v=' + new Date().getTime())
-        .then(response => response.json())
-        .then(data => {
-            // Hava durumu ve Tarih
-            document.getElementById('hava').innerText = data.hava || "Alınamadı";
-            document.getElementById('tarih').innerText = data.tarih || "-";
-            
-            // Palemos Metni
-            const metinAlani = document.getElementById('metin-alani');
-            const bilgiAlani = document.getElementById('bilgi');
-            
-            if (data.palemos && data.palemos.hata === "Yok") {
-                bilgiAlani.innerText = "Karakter Sayısı: " + data.palemos.uzunluk;
-                metinAlani.innerText = data.palemos.ozet;
-            } else {
-                metinAlani.innerText = "Dosya Durumu: " + (data.palemos ? data.palemos.ozet : "Veri bulunamadı");
-            }
-        })
-        .catch(error => {
-            console.error('Hata:', error);
-            document.getElementById('metin-alani').innerText = "Veri okuma hatası! Lütfen 1 dakika bekleyip sayfayı yenileyin.";
-        });
-</script>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Palemos Kontrol Paneli</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; text-align: center; }
+        .box { background: white; max-width: 700px; margin: auto; padding: 20px; border-radius: 10px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .metin { text-align: left; background: #fafafa; padding: 15px; border: 1px solid #ddd; white-space: pre-wrap; height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🏠 Palemos Dijital Panel</h1>
+        <p><b>📍 Konum:</b> Kaş / Antalya</p>
+        <p><b>🌡️ Hava:</b> <span id="hava">...</span></p>
+        <hr>
+        <h3>📖 Palemos Metin (70 Sayfa)</h3>
+        <div id="metin-alani" class="metin">Yükleniyor...</div>
+    </div>
+
+    <script>
+        // Dosyayı taze çekmek için sonuna sayı ekliyoruz (Cache temizliği)
+        fetch('result.json?v=' + Math.random())
+            .then(res => {
+                if(!res.ok) throw new Error("result.json bulunamadı! Lütfen Actions'tan Run Workflow yapın.");
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById('hava').innerText = data.hava || "Veri yok";
+                if(data.palemos) {
+                    document.getElementById('metin-alani').innerText = data.palemos.ozet;
+                }
+            })
+            .catch(err => {
+                document.getElementById('metin-alani').innerHTML = "<b style='color:red'>HATA:</b> " + err.message;
+            });
+    </script>
+</body>
+</html>

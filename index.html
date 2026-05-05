@@ -29,20 +29,24 @@
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(20, 20, 20, 0.95); padding: 20px; display: none; justify-content: center; gap: 30px; align-items: center; border-top: 3px solid var(--accent); z-index: 1000; }
         .nav-btn { padding: 10px 30px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; font-weight: bold; }
         .nav-btn:disabled { opacity: 0.2; }
+        
+        /* Kaldığın Sayfa Notu */
+        #resume-note { font-size: 0.8em; color: var(--accent); margin-top: 10px; display: none; }
     </style>
 </head>
-<body>
+<body class="">
 
 <button class="mode-toggle" id="modeBtn" onclick="modDegistir()">🌙</button>
 
 <div id="search-panel">
-    <input type="text" id="search-input" placeholder="Arşivde ara (Örn: Palemos)..." oninput="ara()">
+    <input type="text" id="search-input" placeholder="Arşivde ara..." oninput="ara()">
 </div>
 
 <div id="kapak">
     <h1>PALEMOS ARŞİVİ</h1>
     <p style="color: var(--accent); font-style: italic;">Anno Domini 1600</p>
     <button class="btn-basla" onclick="kitabiAc()">BELGELERİ OKU</button>
+    <div id="resume-note">En son kaldığınız yerden devam edilecektir.</div>
 </div>
 
 <div class="container" id="kitap-sayfasi">
@@ -57,7 +61,19 @@
 
 <script>
     let sayfalar = [];
-    let aktifIndeks = 0;
+    let aktifIndeks = parseInt(localStorage.getItem('palemos_last_page')) || 0;
+    let isDarkMode = localStorage.getItem('palemos_dark_mode') === 'true';
+
+    // Sayfa açıldığında hafızayı kontrol et
+    window.onload = () => {
+        if(isDarkMode) {
+            document.body.classList.add('dark-mode');
+            document.getElementById('modeBtn').innerText = '☀️';
+        }
+        if(aktifIndeks > 0) {
+            document.getElementById('resume-note').style.display = 'block';
+        }
+    };
 
     function kitabiAc() {
         document.getElementById('kapak').style.display = 'none';
@@ -65,11 +81,13 @@
         document.getElementById('nav').style.display = 'flex';
         document.getElementById('modeBtn').style.display = 'block';
         document.getElementById('search-panel').style.display = 'block';
+        sayfayiGoster();
     }
 
     function modDegistir() {
-        document.body.classList.toggle('dark-mode');
-        document.getElementById('modeBtn').innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        const isDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('palemos_dark_mode', isDark);
+        document.getElementById('modeBtn').innerText = isDark ? '☀️' : '🌙';
     }
 
     fetch('result.json?v=' + Date.now())
@@ -77,15 +95,24 @@
         .then(data => {
             sayfalar = data.palemos.sayfalar;
             document.getElementById('toplamSayfa').innerText = sayfalar.length;
-            sayfayiGoster();
+            // Eğer sayfa yüklenmişse ve kapak kapalıysa göster
+            if(document.getElementById('kitap-sayfasi').style.display === 'block') {
+                sayfayiGoster();
+            }
         });
 
     function sayfayiGoster() {
         if (sayfalar.length > 0) {
+            // Sınır kontrolü
+            if(aktifIndeks >= sayfalar.length) aktifIndeks = 0;
+            
             document.getElementById('metin-alani').innerText = sayfalar[aktifIndeks];
             document.getElementById('aktifSayfa').innerText = aktifIndeks + 1;
             document.getElementById('prevBtn').disabled = (aktifIndeks === 0);
             document.getElementById('nextBtn').disabled = (aktifIndeks === sayfalar.length - 1);
+            
+            // Hafızaya Kaydet
+            localStorage.setItem('palemos_last_page', aktifIndeks);
             window.scrollTo(0, 0);
         }
     }

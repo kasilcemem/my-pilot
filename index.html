@@ -1,42 +1,20 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <title>Dijital Panelim</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f9; text-align: center; padding: 50px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; min-width: 300px; }
-        h1 { color: #333; }
-        .info { font-size: 1.2em; color: #555; margin: 10px 0; }
-        ul { text-align: left; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h1>📊 Dijital Veri Paneli</h1>
-        <p class="info">📍 Konum: Kaş / Antalya</p>
-        <p class="info" id="hava">☀️ Hava: Yükleniyor...</p>
-        <hr>
-        <h3>📂 Dosyalarım:</h3>
-        <ul id="liste"></ul>
-        <p style="font-size: 0.8em; color: #888;" id="tarih"></p>
-    </div>
-
-    <script>
-        // result.json dosyasını oku ve ekrana yazdır
-        fetch('result.json')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('hava').innerText = "☀️ Hava: " + data.kas_hava_durumu;
-                document.getElementById('tarih').innerText = "Son Güncelleme: " + data.guncelleme;
-                
-                const liste = document.getElementById('liste');
-                data.dosya_listesi.forEach(dosya => {
-                    let li = document.createElement('li');
-                    li.innerText = dosya;
-                    liste.appendChild(li);
-                });
-            });
-    </script>
-</body>
-</html>
+<!-- HTML içindeki script kısmını şu şekilde güncelle -->
+<script>
+    fetch('result.json')
+        .then(response => response.json())
+        .then(data => {
+            const panel = document.getElementById('liste');
+            
+            // Palemos Özeti Kısmı
+            let div = document.createElement('div');
+            div.innerHTML = `
+                <h3>📖 Palemos Döküman Özeti</h3>
+                <p><i>Toplam Karakter: ${data.palemos_detay.uzunluk}</i></p>
+                <div style="background:#eee; padding:15px; text-align:left; border-left:5px solid #333;">
+                    ${data.palemos_detay.ozet}
+                </div>
+                <button onclick="alert('Tam metin editör moduna yakında geçilecek!')">Düzenlemeye Başla</button>
+            `;
+            panel.appendChild(div);
+        });
+</script>

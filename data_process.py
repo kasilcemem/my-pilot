@@ -1,16 +1,19 @@
+import os
 import json
+from datetime import datetime
 
-# Örnek sinyal verileri
-data = [10, 25, 15, 40, 35, 60]
+# 1. Adım: Data klasöründeki dosyaları oku
+dosyalar = os.listdir('./data')
 
-def analiz_et(liste):
-    sonuclar = []
-    for i in range(1, len(liste)):
-        fark = liste[i] - liste[i-1]
-        sonuclar.append({"nokta": i, "deger": liste[i], "fark": fark})
-    return sonuclar
+# 2. Adım: Bilgileri birleştir (İndeksleme)
+sonuc_verisi = {
+    "guncelleme_tarihi": datetime.now().strftime("%d/%m/%Y %H:%M"),
+    "toplam_dosya": len(dosyalar),
+    "dosya_listesi": dosyalar
+}
 
-if __name__ == "__main__":
-    analiz = analiz_et(data)
-    with open("results.json", "w") as f:
-        json.dump(analiz, f)
+# 3. Adım: Sonucu 'result.json' olarak kaydet
+with open('result.json', 'w', encoding='utf-8') as f:
+    json.dump(sonuc_verisi, f, ensure_ascii=False, indent=4)
+
+print("Aşçı işini bitirdi: result.json hazır!")

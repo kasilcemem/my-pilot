@@ -1,0 +1,24 @@
+name: Veri_Isle_Ve_Goster
+on:
+  workflow_dispatch: # Manuel çalıştırma düğmesi
+
+jobs:
+  islem:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Python Hazırla
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Kodu Calistir
+        run: python process.py
+      - name: Kaydet ve Yukle
+        run: |
+          git config --global user.name 'Otomatik_Bot'
+          git config --global user.email 'bot@github.com'
+          git add result.json
+          git commit -m "Sonuç güncellendi" || exit 0
+          git push
